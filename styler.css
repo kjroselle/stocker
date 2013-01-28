@@ -1,0 +1,11 @@
+#searchForm {
+  width:auto;
+  padding:10px;
+  margin:0px;
+}
+
+body {
+  min-width: 357px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
