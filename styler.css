@@ -1,11 +1,53 @@
 #searchForm {
   width:auto;
-  padding:10px;
+  padding-bottom: 5px;
   margin:0px;
 }
 
 body {
-  min-width: 357px;
+  min-width: 400px;
   overflow-x: scroll;
   overflow-y: scroll;
+}
+
+.ticker{
+  font-size: 75%;
+  font-weight: bold;
+}
+
+.name{
+  font-size: 70%;
+}
+
+#addStock {
+  border-bottom: 1px solid gray;
+  border-top: 1px solid gray;
+  padding: 2px;
+  padding-bottom: 4px;
+}
+
+#addStock > * {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+#stocks {
+  padding: 2px;
+}
+
+#stocks .stockEntry > *{
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+#stocks .stockEntry {
+  clear:both;
+}
+
+.addIn {
+  width: 60px;
+}
+
+#nameDiv{
+  float: left;
 }
