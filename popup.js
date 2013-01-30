@@ -7,7 +7,7 @@ var UrlOptions = "&env=store://datatables.org/alltableswithkeys&format=json"
 //http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=yahoo&callback=YAHOO.Finance.SymbolSuggest.ssCallback
 googJson = JSON.parse('{"query":{"count":1,"created":"2013-01-28T21:27:37Z","lang":"en-US","results":{"quote":{"symbol":"GOOG","LastTradePriceOnly":"750.73","Name":"Google Inc."}}}}');
 
-var stocksArray;
+var stocksArray = new Array();
 var stockTableElem;
 
 $(document).ready(function(){
@@ -45,10 +45,24 @@ function addStockDiv(stockJson) {
   var stockTicker = stockJson.query.results.quote.symbol;
   var stockPrice = stockJson.query.results.quote.LastTradePriceOnly;
   
-  var stockNameElement = 
-    '<div id="nameDiv"><div class="ticker">'+stockTicker+'</div>'+
-    '<div class="name">'+stockName+'</div>'+'</div>';
-  var stockPriceElement = '<span>'+stockPrice+'</span>';
+  // var stockNameElement = 
+    // '<div id="nameDiv"><div class="ticker">'+stockTicker+'</div>'+
+    // '<div class="name">'+stockName+'</div>'+'</div>';
+  var stockNameElement = document.createElement('div');
+  stockNameElement.id = 'nameDiv';
+  var tempElement = document.createElement('div');
+  tempElement.className = 'ticker';
+  tempElement.innerHTML = stockTicker;
+  stockNameElement.appendChild(tempElement);
+  var tempElement = document.createElement('div');
+  tempElement.className = 'name';
+  tempElement.innerHTML = stockName;
+  stockNameElement.appendChild(tempElement);
+  
+  
+  // var stockPriceElement = '<span>'+stockPrice+'</span>';
+  var stockPriceElement = document.createElement('span');
+  stockPriceElement.innerHTML = stockPrice;
   var buyFieldElement = '<input type="text" class="addIn" \
     id="buytext" placeholder="Buy Price">';
   var sellFieldElement = '<input type="text" class="addIn" \
@@ -66,7 +80,7 @@ function addStockDiv(stockJson) {
   // need to make an anonymous function in order to pass in arguments
   document.querySelector('button#addButton').addEventListener('click', 
     function() {
-      addStockButtonHandler(stockNameElement, stockPriceElement);
+      addStockButtonHandler(stockNameElement.cloneNode(true), stockPriceElement.cloneNode(true));
     });
 }
 
@@ -109,6 +123,7 @@ function search() {
 
 function delStockButtonHandler(elem, row) {
   var rowIndex = row.rowIndex;
+  stocksArray.splice(rowIndex,1);
   stockTableElem.deleteRow(rowIndex);
   // rowIndex = elem.parentNode.parentNode.rowIndex;
   // stockTableElem.deleteRow(rowIndex);
@@ -116,13 +131,38 @@ function delStockButtonHandler(elem, row) {
 }
 
 function addStockButtonHandler(name, price) {
-  var buyPrice = [document.getElementById("buytext").value];
-  var sellPrice = [document.getElementById("selltext").value];
-  var buyPriceElement = '<span>'+buyPrice+'</span>';
-  var sellPriceElement = '<span>'+sellPrice+'</span>';
-  var delButtonElement = '<button id="delButton">Del</button>';
-  var stockElement = '<div class=stockEntry>'+name+price+buyPriceElement+sellPriceElement+delButtonElement+'</div>';
-  $("#stocks").append(stockElement);
+  var buyPrice = document.getElementById("buytext").value;
+  var sellPrice = document.getElementById("selltext").value;
+  var buyPriceElement = document.createElement('span');
+  buyPriceElement.innerHTML = buyPrice;
+  var sellPriceElement = document.createElement('span');
+  sellPriceElement.innerHTML = sellPrice;
+  var delButtonElement = document.createElement('button');
+  delButtonElement.id = 'delButton';
+  delButtonElement.innerHTML = 'Del';
+  
+  // var stockDivElement = document.createElement('div');
+  // stockDivElement.className = 'stockEntry';
+  
+  // stockDivElement.appendChild(name);
+  // stockDivElement.appendChild(price);
+  // stockDivElement.appendChild(buyPriceElement);
+  // stockDivElement.appendChild(sellPriceElement);
+  // stockDivElement.appendChild(delButtonElement);
+  
+  // $("#stocks").append(stockDivElement);
+  
+  // object to store newly added stock data
+  var stockEntry = new Object();
+  stockEntry.name = name.firstChild.innerHTML;
+  stockEntry.ticker = name.lastChild.innerHTML;
+  stockEntry.price = price.innerHTML;
+  stockEntry.sellPrice = sellPrice;
+  stockEntry.buyPrice = buyPrice;
+  
+  stocksArray.unshift(stockEntry);
+  
+  console.log(stockEntry.name + " " + stockEntry.ticker+ " " +stockEntry.price);
   
   var rowDelElement = document.createElement('button');
   rowDelElement.innerHTML = "Del";
@@ -133,16 +173,12 @@ function addStockButtonHandler(name, price) {
   
   var newCell = newRow.insertCell(0);
   newCell.appendChild(name);
-  // newCell = newRow.insertCell(-1);
-  // newCell.appendChild(price);
-  // newCell = newRow.insertCell(-1);
-  // newCell.appendChild(buyPriceElement);
-  // newCell = newRow.insertCell(-1);
-  // newCell.appendChild(sellPriceElement);
-  var cell1 = newRow.insertCell(0);
-  cell1.innerHTML = "New";
-  var cell2 = newRow.insertCell(0);
-  cell2.innerHTML = "New";
+  newCell = newRow.insertCell(-1);
+  newCell.appendChild(price);
+  newCell = newRow.insertCell(-1);
+  newCell.appendChild(buyPriceElement);
+  newCell = newRow.insertCell(-1);
+  newCell.appendChild(sellPriceElement);
   
   var cell0 = newRow.insertCell(-1);
   cell0.appendChild(rowDelElement);
@@ -150,12 +186,8 @@ function addStockButtonHandler(name, price) {
   rowDelElement.addEventListener('click',
     function() {
       delStockButtonHandler(rowDelElement, newRow);
-    });
+  });
   
-  // document.querySelector('button#delButton').addEventListener('click', 
-    // function() {
-      // delStockButtonHandler();
-    // });
 }
 
 // Add event listeners once the DOM has fully loaded by listening for the
