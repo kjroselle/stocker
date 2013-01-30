@@ -7,6 +7,9 @@ var UrlOptions = "&env=store://datatables.org/alltableswithkeys&format=json"
 //http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=yahoo&callback=YAHOO.Finance.SymbolSuggest.ssCallback
 googJson = JSON.parse('{"query":{"count":1,"created":"2013-01-28T21:27:37Z","lang":"en-US","results":{"quote":{"symbol":"GOOG","LastTradePriceOnly":"750.73","Name":"Google Inc."}}}}');
 
+var stocksArray;
+var stockTableElem;
+
 $(document).ready(function(){
 
   $("#addStock").hide();
@@ -17,6 +20,7 @@ function queryBuilder(symbols) {
   var numSymbols = symbols.length;
   for(var i = 0; i<numSymbols; i++) {
     query += " symbol in (\""+symbols[i]+"\")";
+    // only add "or" for symbols except the last one
     if(i != numSymbols-1)
       query += " or";
   }
@@ -51,17 +55,24 @@ function addStockDiv(stockJson) {
     id="selltext" placeholder="Sell Price">';
   var addButtonElement = '<button id="addButton">Add</button>';
   
+  
+  // var addButtonImgElement = '<a href="#" onMouseOver="changeImage()"><img name="addButtonImg" src="res/add.png" width="22" height="22" border="0" alt="javascript button"></a>';
+  
   $("#addStock").append(stockNameElement, stockPriceElement, 
     buyFieldElement, sellFieldElement, addButtonElement);
-    
   
   $("#addStock").show();
   
   // need to make an anonymous function in order to pass in arguments
   document.querySelector('button#addButton').addEventListener('click', 
     function() {
-      stockButtonHandler(stockNameElement, stockPriceElement);
+      addStockButtonHandler(stockNameElement, stockPriceElement);
     });
+}
+
+function changeImage() {
+  document.images["addButtonImg"].src= "res/del.png";
+  return true;
 }
 
 function getSite(queryUrl) {
@@ -96,19 +107,55 @@ function search() {
   console.log("done search");
 }
 
-function stockButtonHandler(name, price) {
+function delStockButtonHandler(elem, row) {
+  var rowIndex = row.rowIndex;
+  stockTableElem.deleteRow(rowIndex);
+  // rowIndex = elem.parentNode.parentNode.rowIndex;
+  // stockTableElem.deleteRow(rowIndex);
+  // alert('delete ' + rowIndex);
+}
+
+function addStockButtonHandler(name, price) {
   var buyPrice = [document.getElementById("buytext").value];
   var sellPrice = [document.getElementById("selltext").value];
   var buyPriceElement = '<span>'+buyPrice+'</span>';
   var sellPriceElement = '<span>'+sellPrice+'</span>';
   var delButtonElement = '<button id="delButton">Del</button>';
-  var stockElement = '<div class=stockEntry>'+name+price+buyPriceElement+sellPriceElement+'</div>';
+  var stockElement = '<div class=stockEntry>'+name+price+buyPriceElement+sellPriceElement+delButtonElement+'</div>';
   $("#stocks").append(stockElement);
   
-  document.querySelector('button#delButton').addEventListener('click', 
+  var rowDelElement = document.createElement('button');
+  rowDelElement.innerHTML = "Del";
+  
+  var newRow = stockTableElem.insertRow(0);
+  
+  console.log(name);
+  
+  var newCell = newRow.insertCell(0);
+  newCell.appendChild(name);
+  // newCell = newRow.insertCell(-1);
+  // newCell.appendChild(price);
+  // newCell = newRow.insertCell(-1);
+  // newCell.appendChild(buyPriceElement);
+  // newCell = newRow.insertCell(-1);
+  // newCell.appendChild(sellPriceElement);
+  var cell1 = newRow.insertCell(0);
+  cell1.innerHTML = "New";
+  var cell2 = newRow.insertCell(0);
+  cell2.innerHTML = "New";
+  
+  var cell0 = newRow.insertCell(-1);
+  cell0.appendChild(rowDelElement);
+  
+  rowDelElement.addEventListener('click',
     function() {
-      // delStockButtonHandler();
+      delStockButtonHandler(rowDelElement, newRow);
     });
+  
+  // document.querySelector('button#delButton').addEventListener('click', 
+    // function() {
+      // delStockButtonHandler();
+    // });
 }
 
 // Add event listeners once the DOM has fully loaded by listening for the
@@ -116,5 +163,5 @@ function stockButtonHandler(name, price) {
 // specific elements when it triggers.
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('button#searchButton').addEventListener('click', search);
-  // main();
+  stockTableElem = document.getElementById("stockTable");
 });

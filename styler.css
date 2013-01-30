@@ -44,6 +44,14 @@ body {
   clear:both;
 }
 
+#stockTable {
+  border-top:1px solid gray;
+  border-bottom:1px solid gray;
+  border-left:1px solid gray;
+  border-right:1px solid gray;
+  clear:both;
+}
+
 .addIn {
   width: 60px;
 }
