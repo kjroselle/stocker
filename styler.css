@@ -5,7 +5,7 @@
 }
 
 body {
-  min-width: 290px;
+  min-width: 320px;
   overflow-x: scroll;
   overflow-y: scroll;
 }
@@ -31,6 +31,11 @@ body {
   margin-right: 2px;
 }
 
+#nameDiv{
+  float: left;
+  max-width: 90px;
+}
+
 #stocks {
   padding: 2px;
 }
@@ -54,8 +59,4 @@ body {
 
 .addIn {
   width: 60px;
-}
-
-#nameDiv{
-  float: left;
 }
